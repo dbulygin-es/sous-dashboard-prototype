@@ -415,15 +415,14 @@
         <div class="col-cards" id="cards-fulfilled"></div>
       </div>
 
+      <!-- Cancelled column: static by design — no orders ever enter this state in the prototype -->
       <div class="kanban-column" id="col-cancelled">
         <div class="col-header">
           <span class="col-dot dot-red"></span>
           <span class="col-title">Cancelled</span>
           <span class="col-count" id="count-cancelled">0</span>
         </div>
-        <div class="col-cards" id="cards-cancelled">
-          <p class="no-orders">No orders</p>
-        </div>
+        <div class="col-cards" id="cards-cancelled"></div>
       </div>
     </div>
   </div>
@@ -519,6 +518,9 @@
       return order.type === 'uber' ? 'badge-uber' : 'badge-pickup';
     }
 
+    // NOTE: innerHTML is safe here because all data is static seed data.
+    // If this prototype is connected to live API data, all interpolated fields
+    // must be sanitised before innerHTML assignment.
     function renderCard(order) {
       const card = document.createElement('div');
       card.className = `order-card${order.type === 'uber' ? ' uber-direct' : ''}`;
@@ -538,7 +540,7 @@
     }
 
     function renderAllCards() {
-      ['open','preparing','ready','fulfilled'].forEach(col => {
+      ['open','preparing','ready','fulfilled','cancelled'].forEach(col => {
         document.getElementById(`cards-${col}`).innerHTML = '';
       });
 
@@ -546,7 +548,7 @@
         document.getElementById(`cards-${order.state}`).appendChild(renderCard(order));
       });
 
-      ['open','preparing','ready','fulfilled'].forEach(col => {
+      ['open','preparing','ready','fulfilled','cancelled'].forEach(col => {
         const cards = document.getElementById(`cards-${col}`).children.length;
         document.getElementById(`count-${col}`).textContent = cards;
         if (cards === 0) {
@@ -570,7 +572,7 @@
     function advanceState(orderId) {
       const order = ORDERS[orderId];
       const idx = STATE_SEQUENCE.indexOf(order.state);
-      if (idx < STATE_SEQUENCE.length - 1) {
+      if (idx !== -1 && idx < STATE_SEQUENCE.length - 1) {
         order.state = STATE_SEQUENCE[idx + 1];
       }
       renderAllCards();
