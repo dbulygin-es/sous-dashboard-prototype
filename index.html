@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOUS — On-Demand Orders (Uber Direct Prototype)</title>
+  <style>
+    :root {
+      --color-primary: #0D1B3E;
+      --color-text: #111111;
+      --color-muted: #6B7280;
+      --color-border: #E5E7EB;
+      --color-bg: #F9FAFB;
+      --color-white: #FFFFFF;
+
+      /* Order type colours */
+      --color-pickup-badge-bg: #F3F4F6;
+      --color-pickup-badge-text: #6B7280;
+      --color-uber-badge-bg: #DBEAFE;
+      --color-uber-badge-text: #1D4ED8;
+      --color-courier-eta-bg: #D1FAE5;
+      --color-courier-eta-text: #065F46;
+      --color-address-bg: #FEF9C3;
+      --color-address-border: #FDE047;
+
+      --radius-card: 10px;
+      --radius-badge: 4px;
+      --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-family);
+      background: var(--color-bg);
+      color: var(--color-text);
+      min-height: 100vh;
+    }
+
+    /* ── Kanban board layout ── */
+
+    .dashboard {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .dashboard-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+
+    .date-badge {
+      font-size: 13px;
+      color: var(--color-muted);
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      padding: 3px 10px;
+    }
+
+    .kanban {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      align-items: flex-start;
+    }
+
+    .kanban-column {
+      min-width: 200px;
+      flex: 1;
+      background: var(--color-bg);
+      border-radius: var(--radius-card);
+      padding: 12px;
+    }
+
+    .col-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .col-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-orange { background: #F59E0B; }
+    .dot-blue   { background: #3B82F6; }
+    .dot-green  { background: #10B981; }
+    .dot-grey   { background: #9CA3AF; }
+    .dot-red    { background: #EF4444; }
+
+    .col-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text);
+      flex: 1;
+    }
+
+    .col-count {
+      font-size: 12px;
+      color: var(--color-muted);
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 1px 7px;
+    }
+
+    .col-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .no-orders {
+      font-size: 12px;
+      color: var(--color-muted);
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    /* ── Order cards ── */
+
+    .order-card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 12px;
+      cursor: pointer;
+      transition: box-shadow 0.15s;
+    }
+
+    .order-card:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .order-card.uber-direct {
+      border-color: #3B82F6;
+      border-width: 2px;
+    }
+
+    .order-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: var(--radius-badge);
+      padding: 2px 7px;
+      margin-bottom: 7px;
+    }
+
+    .badge-pickup {
+      background: var(--color-pickup-badge-bg);
+      color: var(--color-pickup-badge-text);
+    }
+
+    .badge-uber {
+      background: var(--color-uber-badge-bg);
+      color: var(--color-uber-badge-text);
+    }
+
+    .badge-awaiting {
+      background: var(--color-courier-eta-bg);
+      color: var(--color-courier-eta-text);
+    }
+
+    .order-card .customer-name {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .order-card .order-meta {
+      font-size: 12px;
+      color: var(--color-muted);
+      margin-bottom: 8px;
+    }
+
+    .card-eta-pill {
+      background: var(--color-courier-eta-bg);
+      color: var(--color-courier-eta-text);
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: var(--radius-badge);
+      padding: 3px 8px;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .card-start-prep {
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 0;
+      width: 100%;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    /* ── Modal ── */
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--color-white);
+      border-radius: 14px;
+      padding: 24px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: var(--color-muted);
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-header { margin-bottom: 10px; }
+
+    .modal-time {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .modal-date {
+      font-size: 13px;
+      color: var(--color-muted);
+      margin-bottom: 12px;
+    }
+
+    .modal-customer {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    #modal-badge { margin-bottom: 16px; }
+
+    .modal-eta-panel {
+      background: var(--color-courier-eta-bg);
+      border: 1px solid #10B981;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+    }
+
+    .eta-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-courier-eta-text);
+    }
+
+    .eta-sub {
+      font-size: 13px;
+      color: var(--color-courier-eta-text);
+    }
+
+    .modal-items {
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+
+    .modal-items .item-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 3px 0;
+    }
+
+    .modal-items .item-total {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      border-top: 1px solid var(--color-border);
+      margin-top: 6px;
+      padding-top: 6px;
+    }
+
+    .modal-address {
+      background: var(--color-address-bg);
+      border: 1px solid var(--color-address-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+
+    .address-label {
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .address-value { color: var(--color-muted); }
+
+    .modal-customer-info {
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+
+    .modal-customer-info .info-label {
+      font-size: 11px;
+      color: var(--color-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .modal-customer-info .info-row {
+      padding: 2px 0;
+      color: var(--color-text);
+    }
+
+    .modal-customer-info .info-row span {
+      color: var(--color-muted);
+      margin-right: 6px;
+    }
+
+    .modal-cta {
+      width: 100%;
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .modal-cta:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard">
+    <header class="dashboard-header">
+      <h1>On-Demand Orders</h1>
+      <span class="date-badge">14 Mar 2026</span>
+    </header>
+
+    <div class="kanban">
+      <div class="kanban-column" id="col-open">
+        <div class="col-header">
+          <span class="col-dot dot-orange"></span>
+          <span class="col-title">Open</span>
+          <span class="col-count" id="count-open">2</span>
+        </div>
+        <div class="col-cards" id="cards-open"></div>
+      </div>
+
+      <div class="kanban-column" id="col-preparing">
+        <div class="col-header">
+          <span class="col-dot dot-blue"></span>
+          <span class="col-title">Preparing</span>
+          <span class="col-count" id="count-preparing">0</span>
+        </div>
+        <div class="col-cards" id="cards-preparing"></div>
+      </div>
+
+      <div class="kanban-column" id="col-ready">
+        <div class="col-header">
+          <span class="col-dot dot-green"></span>
+          <span class="col-title">Ready</span>
+          <span class="col-count" id="count-ready">0</span>
+        </div>
+        <div class="col-cards" id="cards-ready"></div>
+      </div>
+
+      <div class="kanban-column" id="col-fulfilled">
+        <div class="col-header">
+          <span class="col-dot dot-grey"></span>
+          <span class="col-title">Fulfilled</span>
+          <span class="col-count" id="count-fulfilled">0</span>
+        </div>
+        <div class="col-cards" id="cards-fulfilled"></div>
+      </div>
+
+      <div class="kanban-column" id="col-cancelled">
+        <div class="col-header">
+          <span class="col-dot dot-red"></span>
+          <span class="col-title">Cancelled</span>
+          <span class="col-count" id="count-cancelled">0</span>
+        </div>
+        <div class="col-cards" id="cards-cancelled">
+          <p class="no-orders">No orders</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">×</button>
+
+      <div class="modal-header">
+        <div class="modal-time" id="modal-time"></div>
+        <div class="modal-date" id="modal-date"></div>
+      </div>
+
+      <div class="modal-customer" id="modal-customer"></div>
+      <span class="order-badge" id="modal-badge"></span>
+
+      <div class="modal-eta-panel" id="modal-eta-panel" style="display:none">
+        <div class="eta-title" id="modal-eta-title"></div>
+        <div class="eta-sub" id="modal-eta-sub"></div>
+      </div>
+
+      <div class="modal-items" id="modal-items"></div>
+
+      <div class="modal-address" id="modal-address" style="display:none">
+        <div class="address-label">📍 Delivery Address</div>
+        <div class="address-value" id="modal-address-value"></div>
+      </div>
+
+      <div class="modal-customer-info" id="modal-customer-info"></div>
+
+      <button class="modal-cta" id="modal-cta"></button>
+    </div>
+  </div>
+
+  <script>
+    const ORDERS = {
+      pickup: {
+        id: 'pickup',
+        type: 'pickup',
+        time: '18:00',
+        date: 'Saturday, 14 March 2026',
+        customer: 'Thijs Visscher',
+        email: 'tlvisscher@gmail.com',
+        phone: '+31683645692',
+        items: [
+          { name: 'Fried Chicken', price: '€16.00' },
+          { name: 'Jerusalem Plate Chicken', price: '€48.00' },
+          { name: "4 Pita's", price: '€7.00' },
+          { name: "NENI's Popcorn Falafel", price: '€18.00' },
+        ],
+        total: '€89.00',
+        state: 'open',
+      },
+      uber: {
+        id: 'uber',
+        type: 'uber',
+        time: '18:30',
+        date: 'Saturday, 14 March 2026',
+        customer: 'Sharon Koopman',
+        email: 'sharon@gmail.com',
+        phone: '+31612345678',
+        items: [
+          { name: 'Jerusalem Plate Chicken', price: '€48.00' },
+          { name: 'NENIs Hummus', price: '€12.00' },
+          { name: 'Carrot Salad', price: '€14.00' },
+          { name: 'Fried Chicken', price: '€16.00' },
+          { name: 'Tahina', price: '€8.00' },
+          { name: "4 Pita's", price: '€7.00' },
+          { name: "2 Pita's", price: '€4.00' },
+        ],
+        total: '€121.00',
+        address: 'Keizersgracht 123, Amsterdam',
+        courier: { name: 'John D.', eta: '~18:42' },
+        state: 'open',
+      },
+    };
+
+    function badgeLabel(order) {
+      const statusLabels = {
+        open: 'Open',
+        preparing: 'Preparing',
+        ready: order.type === 'uber' ? 'Awaiting Courier' : 'Ready',
+        fulfilled: 'Fulfilled',
+      };
+      const icon = order.type === 'uber' ? '🚴' : '🧍';
+      const typeLabel = order.type === 'uber' ? 'Uber Direct' : 'On-demand pickup';
+      return `${icon} ${typeLabel} · ${statusLabels[order.state]}`;
+    }
+
+    function badgeClass(order) {
+      if (order.state === 'ready' && order.type === 'uber') return 'badge-awaiting';
+      return order.type === 'uber' ? 'badge-uber' : 'badge-pickup';
+    }
+
+    function renderCard(order) {
+      const card = document.createElement('div');
+      card.className = `order-card${order.type === 'uber' ? ' uber-direct' : ''}`;
+      card.id = `card-${order.id}`;
+      card.onclick = () => openModal(order.id);
+
+      const etaVisible = order.type === 'uber' && order.state === 'ready';
+
+      card.innerHTML = `
+        <span class="order-badge ${badgeClass(order)}">${badgeLabel(order)}</span>
+        <div class="customer-name">${order.customer}</div>
+        <div class="order-meta">${order.time} · ${order.total}</div>
+        ${order.type === 'uber' ? `<div class="card-eta-pill" style="display:${etaVisible ? 'block' : 'none'}">🛵 ${order.courier.name} · ${order.courier.eta}</div>` : ''}
+        ${order.state === 'open' ? '<button class="card-start-prep" onclick="event.stopPropagation();advanceState(\'' + order.id + '\')">Start Prep</button>' : ''}
+      `;
+      return card;
+    }
+
+    function renderAllCards() {
+      ['open','preparing','ready','fulfilled'].forEach(col => {
+        document.getElementById(`cards-${col}`).innerHTML = '';
+      });
+
+      Object.values(ORDERS).forEach(order => {
+        document.getElementById(`cards-${order.state}`).appendChild(renderCard(order));
+      });
+
+      ['open','preparing','ready','fulfilled'].forEach(col => {
+        const cards = document.getElementById(`cards-${col}`).children.length;
+        document.getElementById(`count-${col}`).textContent = cards;
+        if (cards === 0) {
+          document.getElementById(`cards-${col}`).innerHTML = '<p class="no-orders">No orders</p>';
+        }
+      });
+    }
+
+    renderAllCards();
+
+    // ── State machine ──
+
+    const CTA_LABELS = {
+      open: 'Mark as Preparing',
+      preparing: 'Mark as Ready',
+      ready: 'Mark as Fulfilled',
+    };
+
+    const STATE_SEQUENCE = ['open', 'preparing', 'ready', 'fulfilled'];
+
+    function advanceState(orderId) {
+      const order = ORDERS[orderId];
+      const idx = STATE_SEQUENCE.indexOf(order.state);
+      if (idx < STATE_SEQUENCE.length - 1) {
+        order.state = STATE_SEQUENCE[idx + 1];
+      }
+      renderAllCards();
+      if (order.state !== 'fulfilled') {
+        openModal(orderId);
+      } else {
+        closeModal();
+      }
+    }
+
+    function renderModal(orderId) {
+      const order = ORDERS[orderId];
+
+      document.getElementById('modal-time').textContent = order.time;
+      document.getElementById('modal-date').textContent = order.date;
+      document.getElementById('modal-customer').textContent = order.customer;
+
+      const badge = document.getElementById('modal-badge');
+      badge.textContent = badgeLabel(order);
+      badge.className = `order-badge ${badgeClass(order)}`;
+
+      const etaPanel = document.getElementById('modal-eta-panel');
+      if (order.type === 'uber' && order.state === 'ready') {
+        document.getElementById('modal-eta-title').textContent = `🛵 Courier arriving ${order.courier.eta}`;
+        document.getElementById('modal-eta-sub').textContent = `${order.courier.name} · Uber Direct`;
+        etaPanel.style.display = 'block';
+      } else {
+        etaPanel.style.display = 'none';
+      }
+
+      const itemsEl = document.getElementById('modal-items');
+      itemsEl.innerHTML = order.items.map(i =>
+        `<div class="item-row"><span>1× ${i.name}</span><span>${i.price}</span></div>`
+      ).join('') + `<div class="item-total"><span>Total</span><span>${order.total}</span></div>`;
+
+      const addrEl = document.getElementById('modal-address');
+      if (order.type === 'uber') {
+        document.getElementById('modal-address-value').textContent = order.address;
+        addrEl.style.display = 'block';
+      } else {
+        addrEl.style.display = 'none';
+      }
+
+      document.getElementById('modal-customer-info').innerHTML = `
+        <div class="info-label">Customer Information</div>
+        <div class="info-row"><span>👤</span>${order.customer}</div>
+        <div class="info-row"><span>✉️</span>${order.email}</div>
+        <div class="info-row"><span>📞</span>${order.phone}</div>
+      `;
+
+      const cta = document.getElementById('modal-cta');
+      if (order.state === 'fulfilled') {
+        cta.style.display = 'none';
+      } else {
+        cta.style.display = 'block';
+        cta.textContent = CTA_LABELS[order.state];
+        cta.onclick = () => advanceState(orderId);
+      }
+    }
+
+    function openModal(orderId) {
+      renderModal(orderId);
+      document.getElementById('modal-overlay').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('open');
+    }
+  </script>
+</body>
+</html>
