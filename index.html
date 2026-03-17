@@ -13,13 +13,15 @@
       --color-bg: #F9FAFB;
       --color-white: #FFFFFF;
 
-      /* Order type colours */
-      --color-pickup-badge-bg: #F3F4F6;
-      --color-pickup-badge-text: #6B7280;
-      --color-uber-badge-bg: #DBEAFE;
-      --color-uber-badge-text: #1D4ED8;
-      --color-courier-eta-bg: #D1FAE5;
-      --color-courier-eta-text: #065F46;
+      /* Status colours — cards and badges are coloured by delivery status, not by type */
+      --status-open-bg:       #FEF3C7; --status-open-text:       #92400E; --status-open-accent:       #F59E0B;
+      --status-preparing-bg:  #DBEAFE; --status-preparing-text:  #1E40AF; --status-preparing-accent:  #3B82F6;
+      --status-ready-bg:      #D1FAE5; --status-ready-text:      #065F46; --status-ready-accent:      #10B981;
+      --status-en-route-bg:   #EDE9FE; --status-en-route-text:   #5B21B6; --status-en-route-accent:   #7C3AED;
+      --status-delivered-bg:  #ECFDF5; --status-delivered-text:  #047857; --status-delivered-accent:  #059669;
+      --status-fulfilled-bg:  #F3F4F6; --status-fulfilled-text:  #6B7280; --status-fulfilled-accent:  #9CA3AF;
+
+      /* Address panel */
       --color-address-bg: #FEF9C3;
       --color-address-border: #FDE047;
 
@@ -40,7 +42,7 @@
     /* ── Kanban board layout ── */
 
     .dashboard {
-      max-width: 1200px;
+      max-width: 1300px;
       margin: 0 auto;
       padding: 24px 20px;
     }
@@ -76,7 +78,7 @@
     }
 
     .kanban-column {
-      min-width: 200px;
+      min-width: 210px;
       flex: 1;
       background: var(--color-bg);
       border-radius: var(--radius-card);
@@ -96,11 +98,11 @@
       border-radius: 50%;
       flex-shrink: 0;
     }
-    .dot-orange { background: #F59E0B; }
-    .dot-blue   { background: #3B82F6; }
-    .dot-green  { background: #10B981; }
-    .dot-grey   { background: #9CA3AF; }
-    .dot-red    { background: #EF4444; }
+    .dot-open      { background: var(--status-open-accent); }
+    .dot-preparing { background: var(--status-preparing-accent); }
+    .dot-ready     { background: var(--status-ready-accent); }
+    .dot-fulfilled { background: var(--status-fulfilled-accent); }
+    .dot-red       { background: #EF4444; }
 
     .col-title {
       font-size: 13px;
@@ -131,11 +133,12 @@
       padding: 20px 0;
     }
 
-    /* ── Order cards ── */
+    /* ── Order cards — coloured by delivery status ── */
 
     .order-card {
       background: var(--color-white);
       border: 1px solid var(--color-border);
+      border-left-width: 4px;
       border-radius: var(--radius-card);
       padding: 12px;
       cursor: pointer;
@@ -146,10 +149,13 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
-    .order-card.uber-direct {
-      border-color: #3B82F6;
-      border-width: 2px;
-    }
+    /* Left accent border by status */
+    .card-open      { border-left-color: var(--status-open-accent); }
+    .card-preparing { border-left-color: var(--status-preparing-accent); }
+    .card-ready     { border-left-color: var(--status-ready-accent); }
+    .card-en-route  { border-left-color: var(--status-en-route-accent); }
+    .card-delivered { border-left-color: var(--status-delivered-accent); }
+    .card-fulfilled { border-left-color: var(--status-fulfilled-accent); }
 
     .order-badge {
       display: inline-block;
@@ -160,20 +166,13 @@
       margin-bottom: 7px;
     }
 
-    .badge-pickup {
-      background: var(--color-pickup-badge-bg);
-      color: var(--color-pickup-badge-text);
-    }
-
-    .badge-uber {
-      background: var(--color-uber-badge-bg);
-      color: var(--color-uber-badge-text);
-    }
-
-    .badge-awaiting {
-      background: var(--color-courier-eta-bg);
-      color: var(--color-courier-eta-text);
-    }
+    /* Badge colours by status */
+    .badge-open      { background: var(--status-open-bg);      color: var(--status-open-text); }
+    .badge-preparing { background: var(--status-preparing-bg); color: var(--status-preparing-text); }
+    .badge-ready     { background: var(--status-ready-bg);     color: var(--status-ready-text); }
+    .badge-en-route  { background: var(--status-en-route-bg);  color: var(--status-en-route-text); }
+    .badge-delivered { background: var(--status-delivered-bg); color: var(--status-delivered-text); }
+    .badge-fulfilled { background: var(--status-fulfilled-bg); color: var(--status-fulfilled-text); }
 
     .order-card .customer-name {
       font-size: 13px;
@@ -187,15 +186,13 @@
       margin-bottom: 8px;
     }
 
-    .card-eta-pill {
-      background: var(--color-courier-eta-bg);
-      color: var(--color-courier-eta-text);
+    .card-status-pill {
       font-size: 11px;
       font-weight: 500;
       border-radius: var(--radius-badge);
       padding: 3px 8px;
       margin-top: 4px;
-      display: none;
+      display: inline-block;
     }
 
     .card-start-prep {
@@ -269,25 +266,21 @@
       margin-bottom: 8px;
     }
 
-    #modal-badge { margin-bottom: 16px; }
+    .modal-badge-wrap { margin-bottom: 16px; }
 
-    .modal-eta-panel {
-      background: var(--color-courier-eta-bg);
-      border: 1px solid #10B981;
+    .modal-courier-panel {
       border-radius: 8px;
       padding: 10px 14px;
       margin-bottom: 14px;
     }
 
-    .eta-title {
+    .courier-panel-title {
       font-size: 14px;
       font-weight: 600;
-      color: var(--color-courier-eta-text);
     }
 
-    .eta-sub {
+    .courier-panel-sub {
       font-size: 13px;
-      color: var(--color-courier-eta-text);
     }
 
     .modal-items {
@@ -381,7 +374,7 @@
     <div class="kanban">
       <div class="kanban-column" id="col-open">
         <div class="col-header">
-          <span class="col-dot dot-orange"></span>
+          <span class="col-dot dot-open"></span>
           <span class="col-title">Open</span>
           <span class="col-count" id="count-open">0</span>
         </div>
@@ -390,7 +383,7 @@
 
       <div class="kanban-column" id="col-preparing">
         <div class="col-header">
-          <span class="col-dot dot-blue"></span>
+          <span class="col-dot dot-preparing"></span>
           <span class="col-title">Preparing</span>
           <span class="col-count" id="count-preparing">0</span>
         </div>
@@ -399,7 +392,7 @@
 
       <div class="kanban-column" id="col-ready">
         <div class="col-header">
-          <span class="col-dot dot-green"></span>
+          <span class="col-dot dot-ready"></span>
           <span class="col-title">Ready</span>
           <span class="col-count" id="count-ready">0</span>
         </div>
@@ -408,14 +401,14 @@
 
       <div class="kanban-column" id="col-fulfilled">
         <div class="col-header">
-          <span class="col-dot dot-grey"></span>
+          <span class="col-dot dot-fulfilled"></span>
           <span class="col-title">Fulfilled</span>
           <span class="col-count" id="count-fulfilled">0</span>
         </div>
         <div class="col-cards" id="cards-fulfilled"></div>
       </div>
 
-      <!-- Cancelled column: static by design — no orders ever enter this state in the prototype -->
+      <!-- Cancelled column: static by design — no orders enter this state in the prototype -->
       <div class="kanban-column" id="col-cancelled">
         <div class="col-header">
           <span class="col-dot dot-red"></span>
@@ -438,15 +431,19 @@
       </div>
 
       <div class="modal-customer" id="modal-customer"></div>
-      <span class="order-badge" id="modal-badge"></span>
+      <div class="modal-badge-wrap">
+        <span class="order-badge" id="modal-badge"></span>
+      </div>
 
-      <div class="modal-eta-panel" id="modal-eta-panel" style="display:none">
-        <div class="eta-title" id="modal-eta-title"></div>
-        <div class="eta-sub" id="modal-eta-sub"></div>
+      <!-- Courier panel: shown for uber in ready/en_route/delivered states -->
+      <div class="modal-courier-panel" id="modal-courier-panel" style="display:none">
+        <div class="courier-panel-title" id="modal-courier-title"></div>
+        <div class="courier-panel-sub" id="modal-courier-sub"></div>
       </div>
 
       <div class="modal-items" id="modal-items"></div>
 
+      <!-- Delivery address — Uber Direct only, always visible -->
       <div class="modal-address" id="modal-address" style="display:none">
         <div class="address-label">📍 Delivery Address</div>
         <div class="address-value" id="modal-address-value"></div>
@@ -459,33 +456,24 @@
   </div>
 
   <script>
+    // ── Seed data ──
+
     const ORDERS = {
-      // --- Open ---
+      // Open
       pickup1: {
-        id: 'pickup1',
-        type: 'pickup',
-        time: '18:00',
-        date: 'Saturday, 14 March 2026',
-        customer: 'Thijs Visscher',
-        email: 'tlvisscher@gmail.com',
-        phone: '+31683645692',
+        id: 'pickup1', type: 'pickup', time: '18:00', date: 'Saturday, 14 March 2026',
+        customer: 'Thijs Visscher', email: 'tlvisscher@gmail.com', phone: '+31683645692',
         items: [
           { name: 'Fried Chicken', price: '€16.00' },
           { name: 'Jerusalem Plate Chicken', price: '€48.00' },
           { name: "4 Pita's", price: '€7.00' },
           { name: "NENI's Popcorn Falafel", price: '€18.00' },
         ],
-        total: '€89.00',
-        state: 'open',
+        total: '€89.00', state: 'open',
       },
       uber1: {
-        id: 'uber1',
-        type: 'uber',
-        time: '18:30',
-        date: 'Saturday, 14 March 2026',
-        customer: 'Sharon Koopman',
-        email: 'sharon@gmail.com',
-        phone: '+31612345678',
+        id: 'uber1', type: 'uber', time: '18:30', date: 'Saturday, 14 March 2026',
+        customer: 'Sharon Koopman', email: 'sharon@gmail.com', phone: '+31612345678',
         items: [
           { name: 'Jerusalem Plate Chicken', price: '€48.00' },
           { name: 'NENIs Hummus', price: '€12.00' },
@@ -495,153 +483,149 @@
           { name: "4 Pita's", price: '€7.00' },
           { name: "2 Pita's", price: '€4.00' },
         ],
-        total: '€121.00',
-        address: 'Keizersgracht 123, Amsterdam',
-        courier: { name: 'John D.', eta: '~18:42' },
-        state: 'open',
+        total: '€121.00', address: 'Keizersgracht 123, Amsterdam',
+        courier: { name: 'John D.', eta: '~18:42' }, state: 'open',
       },
 
-      // --- Preparing ---
+      // Preparing
       pickup2: {
-        id: 'pickup2',
-        type: 'pickup',
-        time: '18:15',
-        date: 'Saturday, 14 March 2026',
-        customer: 'Lars Bakker',
-        email: 'lars.bakker@gmail.com',
-        phone: '+31620112233',
+        id: 'pickup2', type: 'pickup', time: '18:15', date: 'Saturday, 14 March 2026',
+        customer: 'Lars Bakker', email: 'lars.bakker@gmail.com', phone: '+31620112233',
         items: [
           { name: 'Shakshuka', price: '€14.00' },
           { name: 'Pita Bread', price: '€4.00' },
           { name: 'Lemonade', price: '€5.00' },
         ],
-        total: '€23.00',
-        state: 'preparing',
+        total: '€23.00', state: 'preparing',
       },
       uber2: {
-        id: 'uber2',
-        type: 'uber',
-        time: '18:45',
-        date: 'Saturday, 14 March 2026',
-        customer: 'Nina de Vries',
-        email: 'nina.devries@gmail.com',
-        phone: '+31655443322',
+        id: 'uber2', type: 'uber', time: '18:45', date: 'Saturday, 14 March 2026',
+        customer: 'Nina de Vries', email: 'nina.devries@gmail.com', phone: '+31655443322',
         items: [
           { name: 'Falafel Plate', price: '€18.00' },
           { name: 'Hummus Bowl', price: '€12.00' },
           { name: 'Sparkling Water', price: '€4.00' },
         ],
-        total: '€34.00',
-        address: 'Prinsengracht 456, Amsterdam',
-        courier: { name: 'Maria S.', eta: '~19:02' },
-        state: 'preparing',
+        total: '€34.00', address: 'Prinsengracht 456, Amsterdam',
+        courier: { name: 'Maria S.', eta: '~19:02' }, state: 'preparing',
       },
 
-      // --- Ready / Awaiting Courier ---
+      // Ready / Awaiting Courier
       pickup3: {
-        id: 'pickup3',
-        type: 'pickup',
-        time: '17:45',
-        date: 'Saturday, 14 March 2026',
-        customer: 'Fatima El-Amin',
-        email: 'fatima.elamin@gmail.com',
-        phone: '+31677889900',
+        id: 'pickup3', type: 'pickup', time: '17:45', date: 'Saturday, 14 March 2026',
+        customer: 'Fatima El-Amin', email: 'fatima.elamin@gmail.com', phone: '+31677889900',
         items: [
           { name: 'Mezze Platter', price: '€22.00' },
           { name: 'Baklava', price: '€8.00' },
         ],
-        total: '€30.00',
-        state: 'ready',
+        total: '€30.00', state: 'ready',
       },
       uber3: {
-        id: 'uber3',
-        type: 'uber',
-        time: '18:00',
-        date: 'Saturday, 14 March 2026',
-        customer: 'Joost van Dam',
-        email: 'joost.vandam@gmail.com',
-        phone: '+31611223344',
+        id: 'uber3', type: 'uber', time: '18:00', date: 'Saturday, 14 March 2026',
+        customer: 'Joost van Dam', email: 'joost.vandam@gmail.com', phone: '+31611223344',
         items: [
           { name: 'Chicken Wrap', price: '€14.00' },
           { name: 'Sweet Potato Fries', price: '€7.00' },
           { name: 'Mint Tea', price: '€4.00' },
         ],
-        total: '€25.00',
-        address: 'Herengracht 789, Amsterdam',
-        courier: { name: 'Ahmed K.', eta: '~18:14' },
-        state: 'ready',
+        total: '€25.00', address: 'Herengracht 789, Amsterdam',
+        courier: { name: 'Ahmed K.', eta: '~18:14' }, state: 'ready',
       },
 
-      // --- Fulfilled ---
+      // Fulfilled — pickup collected, uber en route, uber delivered
       pickup4: {
-        id: 'pickup4',
-        type: 'pickup',
-        time: '17:00',
-        date: 'Saturday, 14 March 2026',
-        customer: 'Emma Janssen',
-        email: 'emma.janssen@gmail.com',
-        phone: '+31644556677',
+        id: 'pickup4', type: 'pickup', time: '17:00', date: 'Saturday, 14 March 2026',
+        customer: 'Emma Janssen', email: 'emma.janssen@gmail.com', phone: '+31644556677',
         items: [
           { name: 'Veggie Bowl', price: '€16.00' },
           { name: 'Fresh Juice', price: '€6.00' },
         ],
-        total: '€22.00',
-        state: 'fulfilled',
+        total: '€22.00', state: 'fulfilled',
       },
       uber4: {
-        id: 'uber4',
-        type: 'uber',
-        time: '17:30',
-        date: 'Saturday, 14 March 2026',
-        customer: 'Pieter Smit',
-        email: 'pieter.smit@gmail.com',
-        phone: '+31633445566',
+        id: 'uber4', type: 'uber', time: '17:30', date: 'Saturday, 14 March 2026',
+        customer: 'Pieter Smit', email: 'pieter.smit@gmail.com', phone: '+31633445566',
         items: [
           { name: 'Lamb Kofta', price: '€20.00' },
           { name: 'Rice Pilaf', price: '€8.00' },
           { name: 'Ayran', price: '€4.00' },
         ],
-        total: '€32.00',
-        address: 'Leidsegracht 22, Amsterdam',
-        courier: { name: 'Yusuf B.', eta: '~17:48' },
-        state: 'fulfilled',
+        total: '€32.00', address: 'Leidsegracht 22, Amsterdam',
+        courier: { name: 'Yusuf B.', eta: '~17:48' }, state: 'en_route',
+      },
+      uber5: {
+        id: 'uber5', type: 'uber', time: '16:30', date: 'Saturday, 14 March 2026',
+        customer: 'Aisha Osei', email: 'aisha.osei@gmail.com', phone: '+31622334455',
+        items: [
+          { name: 'Sabich Sandwich', price: '€13.00' },
+          { name: 'Israeli Salad', price: '€9.00' },
+          { name: 'Still Water', price: '€3.00' },
+        ],
+        total: '€25.00', address: 'Vondelstraat 11, Amsterdam',
+        courier: { name: 'Luca M.', eta: '~16:52' }, state: 'delivered',
       },
     };
 
+    // ── Status config: label, badge class, card class, per order type ──
+
+    const STATUS_CONFIG = {
+      open:      { label: 'Open',             badgeClass: 'badge-open',      cardClass: 'card-open' },
+      preparing: { label: 'Preparing',        badgeClass: 'badge-preparing', cardClass: 'card-preparing' },
+      ready:     { label: 'Ready',            badgeClass: 'badge-ready',     cardClass: 'card-ready' },
+      en_route:  { label: 'En Route',         badgeClass: 'badge-en-route',  cardClass: 'card-en-route' },
+      delivered: { label: 'Delivered',        badgeClass: 'badge-delivered', cardClass: 'card-delivered' },
+      fulfilled: { label: 'Fulfilled',        badgeClass: 'badge-fulfilled', cardClass: 'card-fulfilled' },
+    };
+
+    // Uber Direct overrides the "ready" label
+    function statusLabel(order) {
+      if (order.state === 'ready' && order.type === 'uber') return 'Awaiting Courier';
+      return STATUS_CONFIG[order.state].label;
+    }
+
     function badgeLabel(order) {
-      const statusLabels = {
-        open: 'Open',
-        preparing: 'Preparing',
-        ready: order.type === 'uber' ? 'Awaiting Courier' : 'Ready',
-        fulfilled: 'Fulfilled',
-      };
       const icon = order.type === 'uber' ? '🚴' : '🧍';
       const typeLabel = order.type === 'uber' ? 'Uber Direct' : 'On-demand pickup';
-      return `${icon} ${typeLabel} · ${statusLabels[order.state]}`;
+      return `${icon} ${typeLabel} · ${statusLabel(order)}`;
     }
 
-    function badgeClass(order) {
-      if (order.state === 'ready' && order.type === 'uber') return 'badge-awaiting';
-      return order.type === 'uber' ? 'badge-uber' : 'badge-pickup';
-    }
+    // Column each state maps to in the kanban
+    const STATE_TO_COLUMN = {
+      open: 'open', preparing: 'preparing', ready: 'ready',
+      en_route: 'fulfilled', delivered: 'fulfilled', fulfilled: 'fulfilled',
+    };
+
+    // ── Card renderer ──
 
     // NOTE: innerHTML is safe here because all data is static seed data.
-    // If this prototype is connected to live API data, all interpolated fields
-    // must be sanitised before innerHTML assignment.
+    // If connected to live API data, all interpolated fields must be sanitised first.
     function renderCard(order) {
+      const cfg = STATUS_CONFIG[order.state];
       const card = document.createElement('div');
-      card.className = `order-card${order.type === 'uber' ? ' uber-direct' : ''}`;
+      card.className = `order-card ${cfg.cardClass}`;
       card.id = `card-${order.id}`;
       card.onclick = () => openModal(order.id);
 
-      const etaVisible = order.type === 'uber' && order.state === 'ready';
+      // Courier pill: shown on card for uber in en_route/delivered states
+      let courierPill = '';
+      if (order.type === 'uber' && order.state === 'ready') {
+        courierPill = `<div class="card-status-pill badge-ready">🛵 ${order.courier.name} · ${order.courier.eta}</div>`;
+      } else if (order.type === 'uber' && order.state === 'en_route') {
+        courierPill = `<div class="card-status-pill badge-en-route">🛵 En Route · ${order.courier.name}</div>`;
+      } else if (order.type === 'uber' && order.state === 'delivered') {
+        courierPill = `<div class="card-status-pill badge-delivered">✅ Delivered · ${order.courier.name}</div>`;
+      }
+
+      const startPrepBtn = order.state === 'open'
+        ? `<button class="card-start-prep" onclick="event.stopPropagation();advanceState('${order.id}')">Start Prep</button>`
+        : '';
 
       card.innerHTML = `
-        <span class="order-badge ${badgeClass(order)}">${badgeLabel(order)}</span>
+        <span class="order-badge ${cfg.badgeClass}">${badgeLabel(order)}</span>
         <div class="customer-name">${order.customer}</div>
         <div class="order-meta">${order.time} · ${order.total}</div>
-        ${order.type === 'uber' ? `<div class="card-eta-pill" style="display:${etaVisible ? 'block' : 'none'}">🛵 ${order.courier.name} · ${order.courier.eta}</div>` : ''}
-        ${order.state === 'open' ? '<button class="card-start-prep" onclick="event.stopPropagation();advanceState(\'' + order.id + '\')">Start Prep</button>' : ''}
+        ${courierPill}
+        ${startPrepBtn}
       `;
       return card;
     }
@@ -652,13 +636,14 @@
       });
 
       Object.values(ORDERS).forEach(order => {
-        document.getElementById(`cards-${order.state}`).appendChild(renderCard(order));
+        const col = STATE_TO_COLUMN[order.state] || order.state;
+        document.getElementById(`cards-${col}`).appendChild(renderCard(order));
       });
 
       ['open','preparing','ready','fulfilled','cancelled'].forEach(col => {
-        const cards = document.getElementById(`cards-${col}`).children.length;
-        document.getElementById(`count-${col}`).textContent = cards;
-        if (cards === 0) {
+        const count = document.getElementById(`cards-${col}`).children.length;
+        document.getElementById(`count-${col}`).textContent = count;
+        if (count === 0) {
           document.getElementById(`cards-${col}`).innerHTML = '<p class="no-orders">No orders</p>';
         }
       });
@@ -668,30 +653,46 @@
 
     // ── State machine ──
 
-    const CTA_LABELS = {
-      open: 'Mark as Preparing',
-      preparing: 'Mark as Ready',
-      ready: 'Mark as Fulfilled',
+    const STATE_SEQUENCES = {
+      pickup: ['open', 'preparing', 'ready', 'fulfilled'],
+      uber:   ['open', 'preparing', 'ready', 'en_route', 'delivered'],
     };
 
-    const STATE_SEQUENCE = ['open', 'preparing', 'ready', 'fulfilled'];
+    const CTA_LABELS = {
+      open:      'Mark as Preparing',
+      preparing: 'Mark as Ready',
+      ready:     { pickup: 'Mark as Fulfilled', uber: 'Hand to Courier' },
+      en_route:  'Mark as Delivered',
+    };
+
+    function ctaLabel(order) {
+      const label = CTA_LABELS[order.state];
+      if (typeof label === 'object') return label[order.type];
+      return label;
+    }
+
+    const TERMINAL_STATES = new Set(['fulfilled', 'delivered']);
 
     function advanceState(orderId) {
       const order = ORDERS[orderId];
-      const idx = STATE_SEQUENCE.indexOf(order.state);
-      if (idx !== -1 && idx < STATE_SEQUENCE.length - 1) {
-        order.state = STATE_SEQUENCE[idx + 1];
+      const seq = STATE_SEQUENCES[order.type];
+      const idx = seq.indexOf(order.state);
+      if (idx !== -1 && idx < seq.length - 1) {
+        order.state = seq[idx + 1];
       }
       renderAllCards();
-      if (order.state !== 'fulfilled') {
+      if (!TERMINAL_STATES.has(order.state)) {
         openModal(orderId);
       } else {
         closeModal();
       }
     }
 
+    // ── Modal renderer ──
+
     function renderModal(orderId) {
       const order = ORDERS[orderId];
+      const cfg = STATUS_CONFIG[order.state];
 
       document.getElementById('modal-time').textContent = order.time;
       document.getElementById('modal-date').textContent = order.date;
@@ -699,22 +700,36 @@
 
       const badge = document.getElementById('modal-badge');
       badge.textContent = badgeLabel(order);
-      badge.className = `order-badge ${badgeClass(order)}`;
+      badge.className = `order-badge ${cfg.badgeClass}`;
 
-      const etaPanel = document.getElementById('modal-eta-panel');
-      if (order.type === 'uber' && order.state === 'ready') {
-        document.getElementById('modal-eta-title').textContent = `🛵 Courier arriving ${order.courier.eta}`;
-        document.getElementById('modal-eta-sub').textContent = `${order.courier.name} · Uber Direct`;
-        etaPanel.style.display = 'block';
+      // Courier panel: content and style vary by state
+      const courierPanel = document.getElementById('modal-courier-panel');
+      if (order.type === 'uber' && order.courier) {
+        const panelCfg = {
+          ready:     { bg: 'var(--status-ready-bg)',     border: '#10B981', textColor: 'var(--status-ready-text)',     icon: '🛵', title: `Courier arriving ${order.courier.eta}`, sub: `${order.courier.name} · Uber Direct` },
+          en_route:  { bg: 'var(--status-en-route-bg)',  border: '#7C3AED', textColor: 'var(--status-en-route-text)',  icon: '🛵', title: `En Route · ${order.courier.name}`,         sub: `Estimated delivery ${order.courier.eta}` },
+          delivered: { bg: 'var(--status-delivered-bg)', border: '#059669', textColor: 'var(--status-delivered-text)', icon: '✅', title: `Delivered · ${order.courier.name}`,          sub: 'Order successfully delivered' },
+        }[order.state];
+
+        if (panelCfg) {
+          courierPanel.style.cssText = `display:block;background:${panelCfg.bg};border:1px solid ${panelCfg.border};border-radius:8px;padding:10px 14px;margin-bottom:14px`;
+          document.getElementById('modal-courier-title').style.color = panelCfg.textColor;
+          document.getElementById('modal-courier-sub').style.color = panelCfg.textColor;
+          document.getElementById('modal-courier-title').textContent = `${panelCfg.icon} ${panelCfg.title}`;
+          document.getElementById('modal-courier-sub').textContent = panelCfg.sub;
+        } else {
+          courierPanel.style.display = 'none';
+        }
       } else {
-        etaPanel.style.display = 'none';
+        courierPanel.style.display = 'none';
       }
 
-      const itemsEl = document.getElementById('modal-items');
-      itemsEl.innerHTML = order.items.map(i =>
-        `<div class="item-row"><span>1× ${i.name}</span><span>${i.price}</span></div>`
-      ).join('') + `<div class="item-total"><span>Total</span><span>${order.total}</span></div>`;
+      // Items table
+      document.getElementById('modal-items').innerHTML =
+        order.items.map(i => `<div class="item-row"><span>1× ${i.name}</span><span>${i.price}</span></div>`).join('') +
+        `<div class="item-total"><span>Total</span><span>${order.total}</span></div>`;
 
+      // Delivery address (Uber Direct only)
       const addrEl = document.getElementById('modal-address');
       if (order.type === 'uber') {
         document.getElementById('modal-address-value').textContent = order.address;
@@ -723,6 +738,7 @@
         addrEl.style.display = 'none';
       }
 
+      // Customer info
       document.getElementById('modal-customer-info').innerHTML = `
         <div class="info-label">Customer Information</div>
         <div class="info-row"><span>👤</span>${order.customer}</div>
@@ -730,12 +746,13 @@
         <div class="info-row"><span>📞</span>${order.phone}</div>
       `;
 
+      // CTA
       const cta = document.getElementById('modal-cta');
-      if (order.state === 'fulfilled') {
+      if (TERMINAL_STATES.has(order.state)) {
         cta.style.display = 'none';
       } else {
         cta.style.display = 'block';
-        cta.textContent = CTA_LABELS[order.state];
+        cta.textContent = ctaLabel(order);
         cta.onclick = () => advanceState(orderId);
       }
     }
