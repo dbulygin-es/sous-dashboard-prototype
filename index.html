@@ -383,7 +383,7 @@
         <div class="col-header">
           <span class="col-dot dot-orange"></span>
           <span class="col-title">Open</span>
-          <span class="col-count" id="count-open">2</span>
+          <span class="col-count" id="count-open">0</span>
         </div>
         <div class="col-cards" id="cards-open"></div>
       </div>
@@ -460,8 +460,9 @@
 
   <script>
     const ORDERS = {
-      pickup: {
-        id: 'pickup',
+      // --- Open ---
+      pickup1: {
+        id: 'pickup1',
         type: 'pickup',
         time: '18:00',
         date: 'Saturday, 14 March 2026',
@@ -477,8 +478,8 @@
         total: '€89.00',
         state: 'open',
       },
-      uber: {
-        id: 'uber',
+      uber1: {
+        id: 'uber1',
         type: 'uber',
         time: '18:30',
         date: 'Saturday, 14 March 2026',
@@ -498,6 +499,112 @@
         address: 'Keizersgracht 123, Amsterdam',
         courier: { name: 'John D.', eta: '~18:42' },
         state: 'open',
+      },
+
+      // --- Preparing ---
+      pickup2: {
+        id: 'pickup2',
+        type: 'pickup',
+        time: '18:15',
+        date: 'Saturday, 14 March 2026',
+        customer: 'Lars Bakker',
+        email: 'lars.bakker@gmail.com',
+        phone: '+31620112233',
+        items: [
+          { name: 'Shakshuka', price: '€14.00' },
+          { name: 'Pita Bread', price: '€4.00' },
+          { name: 'Lemonade', price: '€5.00' },
+        ],
+        total: '€23.00',
+        state: 'preparing',
+      },
+      uber2: {
+        id: 'uber2',
+        type: 'uber',
+        time: '18:45',
+        date: 'Saturday, 14 March 2026',
+        customer: 'Nina de Vries',
+        email: 'nina.devries@gmail.com',
+        phone: '+31655443322',
+        items: [
+          { name: 'Falafel Plate', price: '€18.00' },
+          { name: 'Hummus Bowl', price: '€12.00' },
+          { name: 'Sparkling Water', price: '€4.00' },
+        ],
+        total: '€34.00',
+        address: 'Prinsengracht 456, Amsterdam',
+        courier: { name: 'Maria S.', eta: '~19:02' },
+        state: 'preparing',
+      },
+
+      // --- Ready / Awaiting Courier ---
+      pickup3: {
+        id: 'pickup3',
+        type: 'pickup',
+        time: '17:45',
+        date: 'Saturday, 14 March 2026',
+        customer: 'Fatima El-Amin',
+        email: 'fatima.elamin@gmail.com',
+        phone: '+31677889900',
+        items: [
+          { name: 'Mezze Platter', price: '€22.00' },
+          { name: 'Baklava', price: '€8.00' },
+        ],
+        total: '€30.00',
+        state: 'ready',
+      },
+      uber3: {
+        id: 'uber3',
+        type: 'uber',
+        time: '18:00',
+        date: 'Saturday, 14 March 2026',
+        customer: 'Joost van Dam',
+        email: 'joost.vandam@gmail.com',
+        phone: '+31611223344',
+        items: [
+          { name: 'Chicken Wrap', price: '€14.00' },
+          { name: 'Sweet Potato Fries', price: '€7.00' },
+          { name: 'Mint Tea', price: '€4.00' },
+        ],
+        total: '€25.00',
+        address: 'Herengracht 789, Amsterdam',
+        courier: { name: 'Ahmed K.', eta: '~18:14' },
+        state: 'ready',
+      },
+
+      // --- Fulfilled ---
+      pickup4: {
+        id: 'pickup4',
+        type: 'pickup',
+        time: '17:00',
+        date: 'Saturday, 14 March 2026',
+        customer: 'Emma Janssen',
+        email: 'emma.janssen@gmail.com',
+        phone: '+31644556677',
+        items: [
+          { name: 'Veggie Bowl', price: '€16.00' },
+          { name: 'Fresh Juice', price: '€6.00' },
+        ],
+        total: '€22.00',
+        state: 'fulfilled',
+      },
+      uber4: {
+        id: 'uber4',
+        type: 'uber',
+        time: '17:30',
+        date: 'Saturday, 14 March 2026',
+        customer: 'Pieter Smit',
+        email: 'pieter.smit@gmail.com',
+        phone: '+31633445566',
+        items: [
+          { name: 'Lamb Kofta', price: '€20.00' },
+          { name: 'Rice Pilaf', price: '€8.00' },
+          { name: 'Ayran', price: '€4.00' },
+        ],
+        total: '€32.00',
+        address: 'Leidsegracht 22, Amsterdam',
+        courier: { name: 'Yusuf B.', eta: '~17:48' },
+        state: 'fulfilled',
       },
     };
 
