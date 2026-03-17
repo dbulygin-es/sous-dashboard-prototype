@@ -551,7 +551,7 @@
           { name: 'Ayran', price: '€4.00' },
         ],
         total: '€32.00', address: 'Leidsegracht 22, Amsterdam',
-        courier: { name: 'Yusuf B.', eta: '~17:48' }, state: 'en_route',
+        courier: { name: 'Yusuf B.', eta: '~17:48', deliveryEta: '~17:58' }, state: 'en_route',
       },
       uber5: {
         id: 'uber5', type: 'uber', time: '16:30', date: 'Saturday, 14 March 2026',
@@ -611,7 +611,8 @@
       if (order.type === 'uber' && order.state === 'ready') {
         courierPill = `<div class="card-status-pill badge-ready">🛵 ${order.courier.name} · ${order.courier.eta}</div>`;
       } else if (order.type === 'uber' && order.state === 'en_route') {
-        courierPill = `<div class="card-status-pill badge-en-route">🛵 En Route · ${order.courier.name}</div>`;
+        const deliveryEta = order.courier.deliveryEta || order.courier.eta;
+        courierPill = `<div class="card-status-pill badge-en-route">🛵 En Route · Delivery ${deliveryEta}</div>`;
       } else if (order.type === 'uber' && order.state === 'delivered') {
         courierPill = `<div class="card-status-pill badge-delivered">✅ Delivered · ${order.courier.name}</div>`;
       }
@@ -707,7 +708,7 @@
       if (order.type === 'uber' && order.courier) {
         const panelCfg = {
           ready:     { bg: 'var(--status-ready-bg)',     border: '#10B981', textColor: 'var(--status-ready-text)',     icon: '🛵', title: `Courier arriving ${order.courier.eta}`, sub: `${order.courier.name} · Uber Direct` },
-          en_route:  { bg: 'var(--status-en-route-bg)',  border: '#7C3AED', textColor: 'var(--status-en-route-text)',  icon: '🛵', title: `En Route · ${order.courier.name}`,         sub: `Estimated delivery ${order.courier.eta}` },
+          en_route:  { bg: 'var(--status-en-route-bg)',  border: '#7C3AED', textColor: 'var(--status-en-route-text)',  icon: '🛵', title: `En Route · ${order.courier.name}`,         sub: `Delivery ETA ${order.courier.deliveryEta || order.courier.eta}` },
           delivered: { bg: 'var(--status-delivered-bg)', border: '#059669', textColor: 'var(--status-delivered-text)', icon: '✅', title: `Delivered · ${order.courier.name}`,          sub: 'Order successfully delivered' },
         }[order.state];
 
